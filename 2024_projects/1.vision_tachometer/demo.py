@@ -25,15 +25,23 @@ class VideoProcessor:
         self.fps = int(self.cap.get(cv2.CAP_PROP_FPS))
         print("Height: {}, Width: {}, FPS: {}".format(self.cap_h, self.cap_w, self.fps) )
         # create video writer
-        self.writer = cv2.VideoWriter(output_path, cv2.VideoWriter_fourcc(*'mp4v'), 25, (self.cap_w//2, self.cap_h//2))
+        # output = left: raw gray frame (640x480) + right: graph with fps/rpm (480x480) => 1120x480
+        self.writer = cv2.VideoWriter(output_path, cv2.VideoWriter_fourcc(*'mp4v'), 25, (1120, 480))
         # read the reference image
         self.img = cv2.imread(snap_path)
         self.img = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         # self.img = cv2.resize(self.img, (0, 0), fx=0.5, fy=0.5)
 
         self.data_list = []
-        
-    
+
+
+    def get_current_time(self):
+        '''
+        get current system time as a formatted string
+        @return: current time string, e.g. "2026-08-24 14:30:25"
+        '''
+        return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
     def calculate_similarity(self, image1, image2):
         '''
         use SIFT to calculate similarity
@@ -166,14 +174,20 @@ class VideoProcessor:
             cv2.putText(bg, "fps: " + str(round(fps, 2)), (100, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
             # rpm
             cv2.putText(bg, "rpm: " + str(round(last_rpm, 1)), (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, rpm_color, 2)
+            # current system time
+            cv2.putText(bg, self.get_current_time(), (100, 150), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
 
 
             cv2.imshow('frame', gray)
             cv2.imshow('bg', bg)
             cv2.imshow('new_img', new_img)
 
-            gray = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
-            self.writer.write(gray)
+            # record side-by-side: left = rotating raw frame, right = graph (fps/rpm)
+            gray_bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+            left = cv2.resize(gray_bgr, (640, 480))   # raw frame -> 640x480
+            right = cv2.resize(bg, (480, 480))         # graph -> 480x480
+            combined = cv2.hconcat([left, right])      # -> 1120x480 (matches writer)
+            self.writer.write(combined)
 
             if cv2.waitKey(1) == ord('q'):
                 break
@@ -183,6 +197,8 @@ class VideoProcessor:
         self.cap.release()
         self.writer.release()
         cv2.destroyAllWindows()
+        # print the time when processing finished
+        print("Finished at: {}".format(self.get_current_time()))
 
 if __name__ == "__main__":
     # parse arguments

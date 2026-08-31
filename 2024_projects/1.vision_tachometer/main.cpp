@@ -4,10 +4,15 @@
  * vision based tachometer
  **/
 
-#include <opencv2/opencv.hpp>
-#include <opencv2/xfeatures2d.hpp>
+#include <opencv4/opencv2/opencv.hpp>
 
 #include <iostream>
+#include <sstream>
+#include <iomanip>
+#include <chrono>
+#include <vector>
+#include <string>
+#include <algorithm>
 
 class VideoProcessor
 {
@@ -34,7 +39,7 @@ VideoProcessor::VideoProcessor(char *filename, char *reference_file)
     // set height and width
     capture.set(cv::CAP_PROP_FRAME_WIDTH, 480);
     capture.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
-
+   
     // get frame rate
     int rate = capture.get(cv::CAP_PROP_FPS);
     // cout fps
