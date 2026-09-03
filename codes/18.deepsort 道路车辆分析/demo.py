@@ -2,6 +2,7 @@ from highway_detection import Detector,Tracker,SpeedEstimate
 import cv2
 import numpy as np
 import time
+import os
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -196,7 +197,7 @@ class HighwayAnalyse:
 
 
         
-    def main(self):
+    def main(self, headless=False, output_path=None, max_frames=None):
 
         # 实例化1个检测器
         yolo_detector = Detector()
@@ -215,8 +216,12 @@ class HighwayAnalyse:
         # 前2帧可能未识别，过滤掉
         frame_index = -2
 
-        # videoWriter = cv2.VideoWriter('./record_video/out'+str(time.time())+'.mp4', cv2.VideoWriter_fourcc(*'H264'), fps, (562,1000))
-
+        # 无头模式下把结果写到视频文件，替代 cv2.imshow(离屏环境无法弹窗)
+        videoWriter = None
+        if output_path is not None:
+            os.makedirs(os.path.dirname(output_path) or '.', exist_ok=True)
+            videoWriter = cv2.VideoWriter(
+                output_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (562, 1000))
 
         while True:
 
@@ -248,7 +253,7 @@ class HighwayAnalyse:
             # 每隔 FPS 帧刷新一下位置(1s)，并计算速度
             if (frame_index % fps) == 0:
                 self.update_id_info(tracker_bboxs_l,'left')
-                self.update_id_info(tracker_bboxs_l,'right')
+                self.update_id_info(tracker_bboxs_r,'right')
 
             #绘制
             self.vehicle_num = {'car':0,'truck':0}
@@ -277,22 +282,42 @@ class HighwayAnalyse:
             frame = self.cv2AddChineseText(frame, '90~110: {}'.format(self.track_speeds['90-110']), (l+10,t+150),(0,255,0),20)
             frame = self.cv2AddChineseText(frame, '>110: {}'.format(self.track_speeds['>110']), (l+10,t+180),(0,255,0),20)
 
-            
-            big_frame = np.zeros((1000,562*2,3))
-            big_frame[:,:562] = frame
-            big_frame[:,562:] = frame_copy
 
-            cv2.imshow('origin', frame_copy)
-            cv2.imshow('Detection', frame)
-            
-            # videoWriter.write(frame)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+            # 拼接：左侧原始画面 + 右侧推理结果
+            big_frame = np.zeros((1000,562*2,3), dtype=np.uint8)
+            big_frame[:,:562] = frame_copy
+            big_frame[:,562:] = frame
+
+            if videoWriter is not None:
+                videoWriter.write(frame.astype(np.uint8))
+
+            if not headless:
+                cv2.imshow('Highway Analysis (左:原图 右:推理)', big_frame)
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+
+            # 处理进度 / 帧数上限(用于快速验证)
+            if headless and (frame_index % 10 == 0):
+                print('  已处理 {} 帧'.format(frame_index + 2), flush=True)
+            if max_frames is not None and (frame_index + 2) >= max_frames:
                 break
-        # videoWriter.release()
+
+        if videoWriter is not None:
+            videoWriter.release()
+            print('输出视频已保存: {}'.format(output_path))
         cap.release()
-        cv2.destroyAllWindows()
+        if not headless:
+            cv2.destroyAllWindows()
 
 
 
-highway = HighwayAnalyse()
-highway.main()
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description='高速公路车辆检测/追踪/测速')
+    parser.add_argument('--headless', action='store_true', help='无头模式,不弹窗')
+    parser.add_argument('--output', default=None, help='结果视频输出路径')
+    parser.add_argument('--max-frames', type=int, default=None, help='最多处理帧数')
+    cli = parser.parse_args()
+
+    highway = HighwayAnalyse()
+    highway.main(headless=cli.headless, output_path=cli.output, max_frames=cli.max_frames)
