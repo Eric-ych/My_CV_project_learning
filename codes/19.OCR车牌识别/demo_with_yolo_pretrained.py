@@ -19,7 +19,7 @@ class Plate_detect:
         args.rec_model_dir="./weights/rec/ch_ppocr_server_v2.0_rec_infer/"
         args.rec_char_dict_path="./ppocr/utils/ppocr_keys_v1.txt"
         args.use_angle_cls=False 
-        args.use_gpu=True
+        args.use_gpu=False
         # 检测加识别
         self.text_sys = TextSystem(args)
         # OCR热身

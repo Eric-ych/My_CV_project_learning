@@ -30,13 +30,12 @@ class Detector:
         model = attempt_load(self.weights, map_location=self.device)
         model.to(self.device).eval()
 
-        # 判断系统，支持MACOS 和 windows
-        if _platform == "darwin":
-            # MAC OS X
-            model.float()
-        else:
-            # Windows
+        # 半精度仅在 CUDA 上启用；CPU(含 Linux/Mac)不支持 half 推理，用 float
+        self.half = self.device.type != 'cpu'
+        if self.half:
             model.half()
+        else:
+            model.float()
         
         # 
         self.m = model
@@ -53,12 +52,11 @@ class Detector:
         img = np.ascontiguousarray(img)
         img = torch.from_numpy(img).to(self.device)
 
-        if _platform == "darwin":
-            # MAC OS X
-            img = img.float() 
-        else:
-            # Windows
+        # 与模型精度保持一致：CUDA 用 half，CPU 用 float
+        if self.half:
             img = img.half()
+        else:
+            img = img.float()
 
         img /= 255.0  # 图像归一化
         if img.ndimension() == 3:

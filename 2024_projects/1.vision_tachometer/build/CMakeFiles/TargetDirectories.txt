@@ -1,0 +1,3 @@
+/home/DC-EXT-06/Task/Project_CV/CVprojects/2024_projects/1.vision_tachometer/build/CMakeFiles/HelloWorld.dir
+/home/DC-EXT-06/Task/Project_CV/CVprojects/2024_projects/1.vision_tachometer/build/CMakeFiles/edit_cache.dir
+/home/DC-EXT-06/Task/Project_CV/CVprojects/2024_projects/1.vision_tachometer/build/CMakeFiles/rebuild_cache.dir

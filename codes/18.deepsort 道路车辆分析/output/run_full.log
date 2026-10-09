@@ -1,0 +1,39 @@
+Downloading https://ultralytics.com/assets/Arial.ttf to /home/DC-EXT-06/.config/Ultralytics/Arial.ttf...
+fatal: cannot change to '/home/DC-EXT-06/Task/Project_CV/CVprojects/codes/18.deepsort': 没有那个文件或目录
+YOLOv5 🚀 2026-9-2 torch 1.13.1+cpu CPU
+
+Fusing layers... 
+YOLOv5m_highway summary: 290 layers, 20856975 parameters, 0 gradients
+Loading weights from weights/highway_reid.pt... Done!
+Loading weights from weights/highway_reid.pt... Done!
+当前视频帧率为：24
+  已处理 2 帧
+left侧车道，新增：15辆车位置信息
+right侧车道，新增：7辆车位置信息
+  已处理 12 帧
+  已处理 22 帧
+left侧车道，刷新14辆车信息，新增1辆车位置信息
+right侧车道，刷新7辆车信息，新增2辆车位置信息
+  已处理 32 帧
+  已处理 42 帧
+left侧车道，刷新15辆车信息，新增3辆车位置信息
+right侧车道，刷新8辆车信息，新增1辆车位置信息
+  已处理 52 帧
+  已处理 62 帧
+  已处理 72 帧
+left侧车道，刷新18辆车信息，新增0辆车位置信息
+right侧车道，刷新9辆车信息，新增1辆车位置信息
+  已处理 82 帧
+  已处理 92 帧
+left侧车道，刷新17辆车信息，新增0辆车位置信息
+right侧车道，刷新10辆车信息，新增0辆车位置信息
+  已处理 102 帧
+  已处理 112 帧
+  已处理 122 帧
+left侧车道，刷新15辆车信息，新增1辆车位置信息
+right侧车道，刷新9辆车信息，新增1辆车位置信息
+  已处理 132 帧
+  已处理 142 帧
+left侧车道，刷新13辆车信息，新增1辆车位置信息
+right侧车道，刷新10辆车信息，新增0辆车位置信息
+输出视频已保存: output/highway_result.mp4

@@ -1,1 +1,11 @@
 .DS_Store
+
+# Local environments, caches, and large assets
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+/codes/19.OCR车牌识别/output.mp4
+/codes/19.OCR车牌识别/test_imgs/car_plate.mp4
+/codes/19.OCR车牌识别/weights/car_plate_weights.zip
+/codes/19.OCR车牌识别/weights/rec/ch_ppocr_server_v2.0_rec_infer/inference.pdiparams
